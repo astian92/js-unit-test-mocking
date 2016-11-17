@@ -1,0 +1,8 @@
+{
+  "name": "asp.net",
+  "private": true,
+  "dependencies": {
+    "mocha": "2.4.5",
+    "chai": "3.5.0"
+  }
+}
