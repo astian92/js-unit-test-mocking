@@ -53,47 +53,60 @@ describe("#ajax - Ajax extensions I have written to simplify ajax calls", functi
         $.ajax.restore();
     });
 
-    //it("getAndHandle Test", function () {
-    //    //window.InfoNav = { renderResponse: function () { } };
-    //    //let infoNavSpy = sinon.stub(InfoNav, "renderResponse");
+    it("getAndHandle Test", function () {
+        window.InfoNav = { renderResponse: function () { } };
+        let infoNavSpy = sinon.stub(InfoNav, "renderResponse");
 
-    //    //let ticket = { Event: "event" };
-        
-    //    //let promise = sinon.stub($, "ajax")
-    //    //    .resolves(ticket);
+        let ticket = { Event: "event" };
 
-    //    //let url = "http://Test/getAndHandle";
-    //    //let settings = { conf1: 1, conf2: false };
-    //    //let finalArg = { type: "GET", url: url, data: undefined, conf1: settings.conf1, conf2: settings.conf2 };
+        let url = "http://Test/getAndHandle";
+        let settings = { conf1: 1, conf2: false };
+        let finalArg = { type: "GET", url: url, data: undefined, conf1: settings.conf1, conf2: settings.conf2 };
 
-    //    ////Ajax.getAndHandle(url, settings);
+        let ajaxPromiseWrapper = new PromiseWrapper(Promise.resolve(ticket));
+        let ajaxStub = sinon.stub($, "ajax").returns(ajaxPromiseWrapper);
 
-    //    ////let propagated = promise.calledWith(finalArg);
+        var promiseWrapper = Ajax.getAndHandle(url, settings);
 
-    //    ////expect(propagated).to.be.true;
+        return promiseWrapper.promise.then(function (result) {
+            expect(infoNavSpy.calledOnce).to.be.true;
+            expect(ajaxStub.calledWith(finalArg)).to.be.true;
+            expect(result).to.equal(ticket);
 
-    //    //infoNavSpy.restore();
-    //    //$.ajax.restore();
+            infoNavSpy.restore();
+            $.ajax.restore();
+        });
+    });
+
+    it("Eventually without should", function () {
+        let promiseStub = sinon.stub($, "ajax")
+            .resolves(5);
+        let promise = promiseStub();
+
+        expect(promise).to.eventually.equal(5);
+    });
+
+    //it("testing stubs using done", function (done) {
+    //    let returnsPromise = sinon.stub($, "ajax").resolves('success');
+
+    //    returnsPromise().then(function (result) {
+    //        expect(result).to.equal('success');
+    //        $.ajax.restore();
+    //        done();
+    //    }, function (error) {
+    //        console.log(error);
+    //        $.ajax.restore();
+    //        done();
+    //    });
     //});
-    it("testing stubs using done", function (done) {
-        let returnsPromise = sinon.stub($, "ajax").resolves('success');
 
-        returnsPromise().then(function (result) {
-            expect(result).to.equal('success');
-            $.ajax.restore();
-            done();
-        }, function (error) {
-            console.log(error);
-            $.ajax.restore();
-            done();
-        })
-    });
-
-    it('testing eventually', function () {
-        let returnsPromise = sinon.stub($, "ajax").resolves('success');
-        return expect(returnsPromise()).should.eventually.equal('success');
-        //return expect(returnsPromise).should.eventually.equal('success');
-    });
+    //it('testing eventually', function () {
+    //    let returnsPromise = sinon.stub($, "ajax").resolves('success');
+    //    //return expect(returnsPromise()).should.eventually.equal('success');
+    //    //return expect(returnsPromise).should.eventually.equal('success');
+    //    //return returnsPromise.should.eventually.equal('success');
+    //    return returnsPromise().should.eventually.equal('success');
+    //});
 
 });
 
